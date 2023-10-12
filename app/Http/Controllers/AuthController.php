@@ -55,6 +55,7 @@ class AuthController extends Controller
         return response()->json([
             'status' => true,
             'message' => "User logged in!",
+            'token' => $authenticatedUser->createToken('task-manager')->plainTextToken,
             'user' => [
                 'name' => $authenticatedUser['name'],
                 'email' => $authenticatedUser['email'],
