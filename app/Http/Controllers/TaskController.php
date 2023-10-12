@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Task\CreateTaskRequest;
+use App\Http\Requests\Task\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Task;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -18,7 +20,11 @@ class TaskController extends Controller
     {
         $tasksCollection = Task::latest()->get();
 
-        return TaskResource::collection($tasksCollection);
+        return response()->json([
+            'status' => true,
+            'message' => "Tasks list",
+            'tasks' => TaskResource::collection($tasksCollection),
+        ]);
     }
 
     /**
@@ -26,11 +32,9 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(CreateTaskRequest $request)
+    public function create()
     {
-        $validatedInput = $request->validated();
-
-        
+        //
     }
 
     /**
@@ -39,9 +43,27 @@ class TaskController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateTaskRequest $request)
     {
-        //
+        $validatedInput = $request->validated();
+
+        try {
+            Task::create([
+                'name' => $validatedInput['name'],
+                'is_completed' => false,
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => "New task added!",
+            ], 201);
+        } catch (\Throwable $th) {
+            //throw $th;
+            throw new HttpResponseException(response()->json([
+                'status' => false,
+                'message' => "Something went wrong!",
+            ], 500));
+        }
     }
 
     /**
@@ -52,7 +74,11 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        //
+        return response()->json([
+            'status' => true,
+            'message' => "Task data",
+            'task' => new TaskResource($task),
+        ]);
     }
 
     /**
@@ -73,9 +99,27 @@ class TaskController extends Controller
      * @param  \App\Models\Task  $task
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Task $task)
+    public function update(UpdateTaskRequest $request, Task $task)
     {
-        //
+        $validatedInputs = $request->validated();
+
+        try {
+            $task->update([
+                'name' => $validatedInputs['name'],
+                'is_completed' => $validatedInputs['status'],
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => "Task data has been updated.",
+            ], 200);
+        } catch (\Throwable $th) {
+            throw $th;
+            throw new HttpResponseException(response()->json([
+                'status' => false,
+                'message' => "Something went wrong!",
+            ], 500));
+        }
     }
 
     /**
@@ -86,6 +130,18 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        //
+        try {
+            $task->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => "Task data deleted",
+            ], 200);
+        } catch (\Throwable $th) {
+            throw new HttpResponseException(response()->json([
+                'status' => false,
+                'message' => "Something went wrong!",
+            ], 500));
+        }
     }
 }

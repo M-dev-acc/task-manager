@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,10 +28,9 @@ Route::group([
     Route::post('/login', [AuthController::class, 'login'])->name('login');
 
     Route::group([
-        'prefix' => "tasks",
-        'as' => "task.",
         'middleware' => "auth:sanctum",
     ], function () {
         
+        Route::resource('tasks', TaskController::class);
     });
 });
