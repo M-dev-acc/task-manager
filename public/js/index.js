@@ -74,3 +74,28 @@ function setupFormSubmit(formConfig) {
         sendAjaxRequest(ajaxRequestParams);
     });    
 }
+
+function deleteTask(taskId) {
+    const baseUrl = window.location.origin;
+    const authToken = localStorage.getItem('auth-token');
+
+    sendAjaxRequest({
+        url: `${baseUrl}/api/v1/tasks/${taskId}`,
+        type: 'DELETE',
+        headers: {
+            'Authorization': 'Bearer ' + authToken,
+        },
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            alert(response.message);
+        },
+        error: function (error) {
+            const errorResponse = error.responseText;
+            const responseObject = JSON.parse(errorResponse);
+            
+            console.error(error.responseText);
+            alert(responseObject.message);
+        }
+    });
+}

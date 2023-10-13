@@ -61,6 +61,38 @@
         </div>
     </div>
 
+    <div class="modal fade" id="editTaskModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editTaskModalTitle" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="editTaskModalTitle">Edit task</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <form method="post" id="addTaskForm">
+                        <div class="mb-3">
+                            <label for="nameInput" class="form-label">Name</label>
+                            <input type="text" name="name" id="editNameInput" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="nameInput" class="form-label">Status</label>
+                            <input type="checkbox" name="status" id="editStatusInput" class="form-check-input">
+                        </div>
+                        
+                        <div class="my-3">
+                            <input type="submit" value="Add new task" class="btn btn-primary " >
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="{{ asset('js/index.js') }}"></script>
     <script>
         $(document).ready(function () {
@@ -85,7 +117,7 @@
                     {
                         "data": null,
                         "render": function (data, type, row) {
-                            return '<button class="btn btn-primary btn-sm" onclick="editTask(' + data.id + ')">Edit</button>';
+                            return '<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editTaskModal" data-task-id="' + data.id + '">Edit</button>';
                         }
                     },
                     {
@@ -111,10 +143,40 @@
                 }
             });
 
-            $('#addTaskForm').on('submit', function (event) {
-                event.preventDefault();
+            $('#editTaskModal').on('show.bs.modal', function (event) {
+                const baseUrl = window.location.origin;
+                const editTaskButton = event.relatedTarget;
+                const taskId = editTaskButton.dataset.taskId;
+
+                sendAjaxRequest({
+                    url: `${baseUrl}/api/v1/tasks/${taskId}`,
+                    type: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + authToken,
+                    },
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        const taskObject = response.task;
+
+                        $('#editNameInput').val(taskObject.name);
+                        
+                        const taskStatus = (taskObject.isCompleted) ? true : false;
+                        $('#editStatusInput').attr('checked', taskStatus);
+                        
+                    },
+                    error: function (error) {
+                        const errorResponse = error.responseText;
+                        const responseObject = JSON.parse(errorResponse);
+                        
+                        console.error(error.responseText);
+                        alert(responseObject.message);
+                    }
+                });
+
                 
-            })
+            });
+
         })
     </script>
 </body>
