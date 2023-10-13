@@ -37,7 +37,37 @@
     <script>
         $(document).ready(function () {
             isUserLoggedIn();
-            $('#tasksDataTable').DataTable();
+            const baseUrl = window.location.origin;
+            const authToken = localStorage.getItem('auth-token');
+
+
+            $('#tasksDataTable').DataTable({
+                ajax: {
+                    'url': `${baseUrl}/api/v1/tasks`,
+                    'type': 'GET',
+                    'headers': {
+                        'Authorization': 'Bearer ' + authToken,
+                    },
+                    'dataSrc': "tasks"
+                },
+                "columns": [
+                    { "data": "id", "title": "Id" }, 
+                    { "data": "name", "title": "Task" }, 
+                    { "data": "isCompleted", "title": "Status" },
+                    {
+                        "data": null,
+                        "render": function (data, type, row) {
+                            return '<button class="btn btn-primary btn-sm" onclick="editTask(' + data.id + ')">Edit</button>';
+                        }
+                    },
+                    {
+                        "data": null,
+                        "render": function (data, type, row) {
+                            return '<button class="btn btn-danger btn-sm" onclick="deleteTask(' + data.id + ')">Delete</button>';
+                        }
+                    }
+                ]
+            });
         })
     </script>
 </body>
