@@ -48,7 +48,6 @@ function setupFormSubmit(formConfig) {
         event.preventDefault();
         const submittedForm = event.target;
         const formInupts = new FormData(submittedForm);
-
         submittedForm.reset();
 
         const ajaxRequestParams = {

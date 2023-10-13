@@ -70,14 +70,15 @@
                 </div>
                 <div class="modal-body">
 
-                    <form method="post" id="addTaskForm">
+                    <form method="post" id="editTaskForm">
+                        <input type="hidden" name="task_id" id="taskIdInput">
                         <div class="mb-3">
                             <label for="nameInput" class="form-label">Name</label>
                             <input type="text" name="name" id="editNameInput" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="nameInput" class="form-label">Status</label>
-                            <input type="checkbox" name="status" id="editStatusInput" class="form-check-input">
+                            <input type="checkbox" name="status" value="1" id="editStatusInput" class="form-check-input">
                         </div>
                         
                         <div class="my-3">
@@ -160,10 +161,11 @@
                         const taskObject = response.task;
 
                         $('#editNameInput').val(taskObject.name);
-                        
+                        $('#taskIdInput').val(taskObject.id);
+
                         const taskStatus = (taskObject.isCompleted) ? true : false;
                         $('#editStatusInput').attr('checked', taskStatus);
-                        
+                           
                     },
                     error: function (error) {
                         const errorResponse = error.responseText;
@@ -173,10 +175,43 @@
                         alert(responseObject.message);
                     }
                 });
-
+             
                 
             });
 
+            
+            $("#editTaskForm").on('submit', function (event) {
+                event.preventDefault();
+                
+                const submittedForm = event.target;
+                const taskId = $('#taskIdInput').val();
+                const formInupts = {};
+
+                $(submittedForm).serializeArray().forEach(input => {
+                    formInupts[input.name] = input.value;
+                });
+                console.log(formInupts);
+                sendAjaxRequest({
+                    url: `${baseUrl}/api/v1/tasks/${taskId}`,
+                    type: 'PATCH',
+                    data: $(submittedForm).serializeArray(),
+                    headers: {
+                        'Authorization': 'Bearer ' + authToken,
+                    },
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        alert(response.message);                            
+                    },
+                    error: function (error) {
+                        const errorResponse = error.responseText;
+                        const responseObject = JSON.parse(errorResponse);
+                        
+                        console.error(error.responseText);
+                        alert(responseObject.message);
+                    }
+                });
+            });
         })
     </script>
 </body>

@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Task;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 
 class UpdateTaskRequest extends FormRequest
@@ -28,5 +30,15 @@ class UpdateTaskRequest extends FormRequest
             'name' => "required|string|min:2|max:255",
             'status' => "required|boolean",
         ];
+    }
+
+    public function failedValidation(Validator $validator)
+    {
+        $errorMessages = $validator->errors()->messages();
+
+        throw new HttpResponseException(response()->json([
+            'status' => false,
+            'message' => reset($errorMessages)[0],
+        ], 422));
     }
 }
