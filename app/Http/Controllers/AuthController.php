@@ -50,16 +50,26 @@ class AuthController extends Controller
             ], 401)); 
         }
 
-        $authenticatedUser = Auth::user();
+        $authUser = Auth::user();
         
         return response()->json([
             'status' => true,
             'message' => "User logged in!",
-            'token' => $authenticatedUser->createToken('task-manager')->plainTextToken,
+            'token' => $authUser->createToken('task-manager')->plainTextToken,
             'user' => [
-                'name' => $authenticatedUser['name'],
-                'email' => $authenticatedUser['email'],
+                'name' => $authUser['name'],
+                'email' => $authUser['email'],
             ]
         ], 200);
+    }
+
+    public function logout() {
+        $authUser = Auth::user();
+        $authUser->tokens()->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => "User logged out."
+        ], 204);
     }
 }
