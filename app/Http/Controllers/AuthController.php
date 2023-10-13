@@ -72,4 +72,27 @@ class AuthController extends Controller
             'message' => "User logged out."
         ], 204);
     }
+
+    public function isLoggedIn() {
+        $response = [
+            'body' => [
+                'status' => false,
+                'message' => "User not logged in."
+            ], 
+            'status' => 401,
+        ];
+
+        if (Auth::check()) {
+            $response = [
+                'body' => [
+                    'status' => true,
+                    'message' => "User logged out."
+                ], 
+                'status' => 204,
+            ];
+        }
+
+        return response()->json($response['body'], $response['status']);
+
+    }
 }

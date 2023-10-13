@@ -21,17 +21,25 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::group([
-    'prefix' => "v1",
-    'as' => "auth.",
+    'as' => "api.",
 ], function () {
-    Route::post('/register', [AuthController::class, 'register'])->name('register');
-    Route::post('/login', [AuthController::class, 'login'])->name('login');
 
     Route::group([
-        'middleware' => "auth:sanctum",
+        'prefix' => "v1",
+        'as' => "auth.",
     ], function () {
+
+        Route::post('/register', [AuthController::class, 'register'])->name('register');
+        Route::post('/login', [AuthController::class, 'login'])->name('login');
         
-        Route::post('/logout', [AuthController::class, 'logout'])->name('logout');        
-        Route::resource('tasks', TaskController::class);
+    
+        Route::group([
+            'middleware' => "auth:sanctum",
+        ], function () {
+            Route::get('/user', [AuthController::class, 'isLoggedIn'])->name('check');
+            Route::post('/logout', [AuthController::class, 'logout'])->name('logout'); 
+
+            Route::resource('tasks', TaskController::class)->except(['create', 'edit']);
+        });
     });
 });
