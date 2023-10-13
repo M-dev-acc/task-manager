@@ -23,7 +23,7 @@
         <section class="card">
             <header class="card-header d-flex">
                 <h2 class="card-title">Tasks</h2> 
-                <button class="btn btn-primary ms-auto">Add task</button>
+                <button class="btn btn-primary ms-auto" type="button" data-bs-toggle="modal" data-bs-target="#addTaskModal">Add task</button>
             </header>
             <div class="card-body">
                 <table class="table" id="tasksDataTable"></table>
@@ -32,6 +32,34 @@
     </main>
 
     <footer></footer>
+
+    <div class="modal fade" id="addTaskModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addTaskModalTitle" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="addTaskModalTitle">Add</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <form method="post" id="addTaskForm">
+                        <div class="mb-3">
+                            <label for="nameInput" class="form-label">Name</label>
+                            <input type="text" name="name" id="nameInput" class="form-control">
+                        </div>
+                        
+                        <div class="my-3">
+                            <input type="submit" value="Add new task" class="btn btn-primary " >
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="{{ asset('js/index.js') }}"></script>
     <script>
@@ -68,6 +96,25 @@
                     }
                 ]
             });
+
+            setupFormSubmit({
+                selector: '#addTaskForm', 
+                requestType: 'POST', 
+                actionUrl: "{{ route('api.auth.tasks.store') }}",
+                headers: {
+                    'Authorization': 'Bearer ' + authToken,
+                },
+                successCallback: function (response) {
+
+                    alert(response.message);
+                    $('button[data-bs-dismiss="modal"]').click();
+                }
+            });
+
+            $('#addTaskForm').on('submit', function (event) {
+                event.preventDefault();
+                
+            })
         })
     </script>
 </body>

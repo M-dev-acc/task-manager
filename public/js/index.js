@@ -50,7 +50,8 @@ function setupFormSubmit(formConfig) {
         const formInupts = new FormData(submittedForm);
 
         submittedForm.reset();
-        sendAjaxRequest({
+
+        const ajaxRequestParams = {
             url: formConfig.actionUrl,
             data: formInupts,
             type: formConfig.requestType,
@@ -64,8 +65,12 @@ function setupFormSubmit(formConfig) {
                 console.error(error.responseText);
                 alert(responseObject.message);
             },
-        });
+        }
 
-        
+        if (formConfig.headers) {
+            ajaxRequestParams['headers'] = formConfig.headers;
+        }
+
+        sendAjaxRequest(ajaxRequestParams);
     });    
 }

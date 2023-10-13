@@ -64,7 +64,7 @@
             setupFormSubmit({
                 selector: '#userRegistrationForm', 
                 requestType: 'POST', 
-                actionUrl: "{{ route('api.auth.register') }}",
+                actionUrl: "{{ route('api.auth.task.store') }}",
                 successCallback: function (response) {
 
                     alert(response.message);
